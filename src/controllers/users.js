@@ -1,6 +1,6 @@
 const config = require("../config");
 
-const database = require("../database");
+const models = require("../models");
 const services = require("../services");
 
 const bcrypt = require('bcrypt');
@@ -15,7 +15,7 @@ const register = async (username, password, type) => {
 
             const passwordHash = bcrypt.hashSync(password, saltRounds);
 
-            await database.users.create(username, passwordHash, type);
+            await models.users.create(username, passwordHash, type);
             resolve({ status: 200 });
             return;
         }
@@ -31,7 +31,7 @@ const login = async (username, password) => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const user = await database.users.findByUsername(username);
+            const user = await models.users.findByUsername(username);
 
             if (!user) {
                 resolve({ status: 401, body: "incorrrect credentials" });
@@ -47,7 +47,7 @@ const login = async (username, password) => {
                 const refreshToken = crypto.randomBytes(8).toString("hex");
                 const encryptedRefreshToken = services.crypto.encrypt(refreshToken);
 
-                await database.tokens.add(username, encryptedRefreshToken, currentTime);
+                await models.tokens.add(username, encryptedRefreshToken, currentTime);
 
                 resolve({
                     status: 200,

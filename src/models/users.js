@@ -1,4 +1,4 @@
-const pool = require("../pool");
+const pool = require("../database/postgres");
 
 const create = async (username, passwordHash, type) => {
 

@@ -1,4 +1,4 @@
-const database = require("../database");
+const models = require("../models");
 const services = require("../services");
 
 const bcrypt = require('bcrypt');
@@ -11,7 +11,7 @@ const refresh = async (refreshToken) => {
         try {
             const encryptedRefreshToken = services.crypto.encrypt(refreshToken);
 
-            const dbToken = await database.tokens.find(encryptedRefreshToken);
+            const dbToken = await models.tokens.find(encryptedRefreshToken);
 
             if (!dbToken) {
                 resolve({
@@ -21,14 +21,14 @@ const refresh = async (refreshToken) => {
                 return;
             }
 
-            const user = await database.users.findById(dbToken.user_id);
+            const user = await models.users.findById(dbToken.user_id);
 
             const currentTime = new Date();
             const accessToken = jwt.sign({ createdAt: currentTime, username: user.username, userType: user.type }, process.env.SECRET, { expiresIn: '1h' });
             const newRefreshToken = crypto.randomBytes(8).toString("hex");
             const newEncryptedRefreshToken = services.crypto.encrypt(newRefreshToken);
 
-            await database.tokens.update(user.user_id, newEncryptedRefreshToken, currentTime);
+            await models.tokens.update(user.user_id, newEncryptedRefreshToken, currentTime);
 
             resolve({
                 "status": 200,

@@ -1,4 +1,4 @@
-const pool = require("../pool");
+const pool = require("../database/postgres");
 
 const add = async (currentUser, listingId, quantity, prebookingNumber) => {
     return new Promise(async (resolve, reject) => {

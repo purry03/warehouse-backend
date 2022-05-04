@@ -1,6 +1,6 @@
 const config = require("../config");
 
-const database = require("../database");
+const models = require("../models");
 const services = require("../services");
 
 const crypto = require("crypto");
@@ -20,7 +20,7 @@ const book = async (user, listingId, quantity) => {
 
             const prebookingNumber = crypto.randomBytes(2).toString("hex").toUpperCase() + "-" + crypto.randomBytes(2).toString("hex").toUpperCase() + "-" + crypto.randomBytes(2).toString("hex").toUpperCase();
 
-            const newBooking = await database.prebookings.add(user, listingId, quantity, prebookingNumber);
+            const newBooking = await models.prebookings.add(user, listingId, quantity, prebookingNumber);
 
             if (newBooking.err) {
                 resolve({
@@ -53,7 +53,7 @@ const cancel = async (user, prebookingNumber) => {
     return new Promise(async (resolve, reject) => {
 
         try {
-            const cancelledPrebooking = await database.prebookings.remove(user, prebookingNumber);
+            const cancelledPrebooking = await models.prebookings.remove(user, prebookingNumber);
 
 
             if (cancelledPrebooking.err) {

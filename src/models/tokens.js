@@ -1,5 +1,5 @@
 const { reject } = require("bcrypt/promises");
-const pool = require("../pool");
+const pool = require("../database/postgres");
 
 
 const find = async (encryptedRefreshToken) => {

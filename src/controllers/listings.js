@@ -1,6 +1,6 @@
 const config = require("../config");
 
-const database = require("../database");
+const models = require("../models");
 const services = require("../services");
 
 const fs = require("fs");
@@ -27,8 +27,8 @@ const create = async (user, file, title, description, price, inventory) => {
             fs.unlinkSync(path.resolve(file.path));
 
             //save to db
-            const listingUser = await database.users.findByUsername(user.username);
-            await database.listings.add(listingUser.user_id, file.filename + "." + mime.extension(file.mimetype), title, description, inventory, price);
+            const listingUser = await models.users.findByUsername(user.username);
+            await models.listings.add(listingUser.user_id, file.filename + "." + mime.extension(file.mimetype), title, description, inventory, price);
 
             resolve({
                 status: 200
