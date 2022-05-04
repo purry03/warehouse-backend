@@ -13,6 +13,11 @@ const add = async (currentUser, listingId, quantity, prebookingNumber) => {
 
             const listing = (await client.query("SELECT inventory FROM listings WHERE listing_id = $1", [listingId])).rows[0];
 
+            if (!listing) {
+                resolve({ err: "listing does not exist" });
+                return;
+            }
+
             const newInventory = listing.inventory - parseInt(quantity);
 
             if (newInventory < 0) {
