@@ -1,13 +1,18 @@
 {
   "dependencies": {
+    "@koa/cors": "^3.3.0",
     "@koa/multer": "^3.0.0",
     "@koa/router": "^10.1.1",
     "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
     "koa-body": "^5.0.0",
+    "koa-mount": "^4.0.0",
+    "koa-static": "^5.0.0",
     "mime-types": "^2.1.35",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "redis": "^4.1.0"
   }
 }

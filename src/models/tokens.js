@@ -1,17 +1,12 @@
-const { reject } = require("bcrypt/promises");
-const pool = require("../database/postgres");
+const { postgres, redis } = require("../database/");
 
 
-const find = async (encryptedRefreshToken) => {
+const find = async (username) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const client = await pool.connect();
-
-            const dbToken = (await pool.query("SELECT * FROM tokens WHERE refresh_token = $1", [encryptedRefreshToken])).rows[0];
-
-            client.release();
-
-            resolve(dbToken);
+            console.log(username);
+            const refreshToken = await redis.get(username);
+            resolve(refreshToken);
         }
         catch (err) {
             reject(err);
@@ -19,14 +14,11 @@ const find = async (encryptedRefreshToken) => {
     });
 };
 
-const add = async (username, encryptedRefreshToken, currentTime) => {
+const add = async (username, encryptedRefreshToken) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const client = await pool.connect();
 
-            await client.query("INSERT INTO tokens(user_id,refresh_token,created_at) VALUES((SELECT user_id FROM users WHERE username = $1),$2,$3) ON CONFLICT(user_id) DO UPDATE SET refresh_token = EXCLUDED.refresh_token,created_at = EXCLUDED.created_at", [username, encryptedRefreshToken, currentTime]);
-
-            client.release();
+            await redis.set(username, encryptedRefreshToken);
 
             resolve(true);
         }
@@ -36,15 +28,10 @@ const add = async (username, encryptedRefreshToken, currentTime) => {
     });
 };
 
-const update = async (user_id, newEncryptedRefreshToken, currentTime) => {
+const update = async (username, newEncryptedRefreshToken) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const client = await pool.connect();
-
-            await client.query("UPDATE tokens SET refresh_token = $2 , created_at = $3 WHERE user_id = $1", [user_id, newEncryptedRefreshToken, currentTime]);
-
-            client.release();
-
+            await redis.set(username, newEncryptedRefreshToken)
             resolve(true);
         }
         catch (err) {

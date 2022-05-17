@@ -2,11 +2,14 @@ const config = require("../config");
 const crypto = require("crypto");
 
 const encrypt = (value) => {
+
     const key = config.SECRET;
     var cipher = crypto.createCipher("aes256", key);
     var encrypted = cipher.update(value, "utf8", "hex");
-    encrypted += cipher.final("hex")
+    encrypted += cipher.final("hex");
+
     return encrypted
+
 }
 
 const decrypt = (encrypted) => {

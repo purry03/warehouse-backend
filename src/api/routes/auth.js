@@ -51,11 +51,11 @@ router.post("/login", async (ctx) => {
 router.post("/refresh", async (ctx) => {
 
     try {
-        const { refreshToken } = ctx.request.body;
+        const { username, refresh_token } = ctx.request.body;
 
         //check if refresh token exists in db
 
-        const response = await controllers.tokens.refresh(refreshToken);
+        const response = await controllers.tokens.refresh(username, refresh_token);
 
         ctx.status = response.status;
         if (response.body) {
@@ -65,7 +65,6 @@ router.post("/refresh", async (ctx) => {
 
     }
     catch (err) {
-
         ctx.status = err.status;
         ctx.body = err.body;
         return;

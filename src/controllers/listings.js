@@ -6,6 +6,7 @@ const services = require("../services");
 const fs = require("fs");
 const path = require("path");
 const mime = require("mime-types");
+const { resolve } = require("path");
 
 const create = async (user, file, title, description, price, inventory) => {
     return new Promise(async (resolve, reject) => {
@@ -21,7 +22,7 @@ const create = async (user, file, title, description, price, inventory) => {
             }
 
             //copy file to public folder
-            fs.copyFileSync(path.resolve(file.path), path.resolve(`../public/${file.filename}.${mime.extension(file.mimetype)}`));
+            fs.copyFileSync(path.resolve(file.path), path.resolve(config.DIR, `./public/${file.filename}.${mime.extension(file.mimetype)}`));
 
             //remove temp file from uploads dir
             fs.unlinkSync(path.resolve(file.path));
@@ -36,6 +37,7 @@ const create = async (user, file, title, description, price, inventory) => {
 
         }
         catch (err) {
+            console.log(err);
             reject({
                 status: 500,
                 body: { err }
@@ -45,5 +47,68 @@ const create = async (user, file, title, description, price, inventory) => {
     });
 };
 
+const remove = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await models.listings.removeByID(id);
 
-module.exports = { create }
+            resolve({
+                status: 200
+            });
+
+        }
+        catch (err) {
+            reject({
+                status: 500,
+                body: { err }
+            });
+        }
+    });
+};
+
+
+const search = async (query) => {
+    try {
+        const listings = await models.listings.find(query);
+        return ({ status: 200, body: listings });
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error({ status: 500, body: err });
+    }
+}
+
+const getAll = async () => {
+    try {
+        const listings = await models.listings.findAll();
+        return ({ status: 200, body: listings });
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error({ status: 500, body: err });
+    }
+}
+
+const getByID = async (id) => {
+    try {
+        const listings = await models.listings.findByID(id);
+        return ({ status: 200, body: listings });
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error({ status: 500, body: err });
+    }
+}
+
+const getByUsername = async (username) => {
+    try {
+        const listings = await models.listings.findByUsername(username);
+        return ({ status: 200, body: listings });
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error({ status: 500, body: err });
+    }
+}
+
+module.exports = { create, remove, search, getAll, getByID, getByUsername }

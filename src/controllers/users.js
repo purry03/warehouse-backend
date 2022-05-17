@@ -6,6 +6,7 @@ const services = require("../services");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { use } = require("../api");
 
 const register = async (username, password, type) => {
 
@@ -53,6 +54,7 @@ const login = async (username, password) => {
                     status: 200,
                     body: {
                         username: username,
+                        type: user.type,
                         access_token: accessToken,
                         token_type: "jwt",
                         expires_in: 3600,
@@ -71,6 +73,8 @@ const login = async (username, password) => {
 
         }
         catch (err) {
+            console.log(err);
+
 
             reject({
                 status: 500,

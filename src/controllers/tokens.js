@@ -5,13 +5,15 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require("jsonwebtoken");
 
-const refresh = async (refreshToken) => {
+const refresh = async (username, refreshToken) => {
 
     return new Promise(async (resolve, reject) => {
         try {
+
             const encryptedRefreshToken = services.crypto.encrypt(refreshToken);
 
-            const dbToken = await models.tokens.find(encryptedRefreshToken);
+            const dbToken = await services.crypto.decrypt(await models.tokens.find(username));
+
 
             if (!dbToken) {
                 resolve({
@@ -21,14 +23,22 @@ const refresh = async (refreshToken) => {
                 return;
             }
 
-            const user = await models.users.findById(dbToken.user_id);
+            if (dbToken != refreshToken) {
+                resolve({
+                    status: 401,
+                    body: { err: "invalid refresh token" }
+                });
+                return;
+            }
+
+            const user = await models.users.findByUsername(username);
 
             const currentTime = new Date();
             const accessToken = jwt.sign({ createdAt: currentTime, username: user.username, userType: user.type }, process.env.SECRET, { expiresIn: '1h' });
             const newRefreshToken = crypto.randomBytes(8).toString("hex");
             const newEncryptedRefreshToken = services.crypto.encrypt(newRefreshToken);
 
-            await models.tokens.update(user.user_id, newEncryptedRefreshToken, currentTime);
+            await models.tokens.update(username, newEncryptedRefreshToken, currentTime);
 
             resolve({
                 "status": 200,
@@ -37,7 +47,7 @@ const refresh = async (refreshToken) => {
                     access_token: accessToken,
                     token_type: "jwt",
                     expires_in: 3600,
-                    refresh_token: refreshToken
+                    refresh_token: newRefreshToken
                 }
             });
 
