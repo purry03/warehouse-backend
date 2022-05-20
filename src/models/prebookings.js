@@ -49,7 +49,7 @@ const add = async (currentUser, listingId, quantity, prebookingNumber) => {
     });
 }
 
-const remove = async (currentUser, prebooking_number) => {
+const remove = async (prebooking_number) => {
     return new Promise(async (resolve, reject) => {
 
         const client = await pool.connect();
@@ -64,15 +64,6 @@ const remove = async (currentUser, prebooking_number) => {
             if (!prebook) {
                 await client.query('ROLLBACK');
                 resolve({ err: "invalid prebooking number" });
-                return;
-            }
-
-            //check if prebook blongs to current user
-            const user = (await client.query("SELECT user_id FROM users WHERE username = $1", [currentUser.username])).rows[0];
-
-            if (user.user_id != prebook.user_id) {
-                await client.query('ROLLBACK')
-                resolve({ err: "action not allowed" });
                 return;
             }
 
@@ -106,4 +97,63 @@ const remove = async (currentUser, prebooking_number) => {
     });
 }
 
-module.exports = { add, remove };
+const approve = async (prebooking_number) => {
+    return new Promise(async (resolve, reject) => {
+
+        const client = await pool.connect();
+
+        try {
+
+            await client.query("BEGIN");
+
+
+            await client.query("DELETE FROM prebookings WHERE prebooking_number = $1", [prebooking_number]);
+
+
+            await client.query('COMMIT')
+
+            resolve(true);
+        }
+        catch (err) {
+            console.log(err);
+            await client.query("ROLLBACK");
+
+            reject(err);
+        }
+        finally {
+            client.release();
+
+        }
+    });
+}
+
+const get = async (prebookingNumber) => {
+    return new Promise(async (resolve, reject) => {
+
+        const client = await pool.connect();
+
+        try {
+
+            await client.query("BEGIN");
+
+            const prebooking = (await client.query("SELECT * FROM prebookings WHERE prebooking_number = $1", [prebookingNumber])).rows[0];
+            const user = (await client.query("SELECT * FROM users WHERE user_id = $1", [prebooking.user_id])).rows[0];
+            const listing = (await client.query("SELECT * FROM listings WHERE listing_id = $1", [prebooking.listing_id])).rows[0];
+
+
+            resolve({ username: user.username, quantity: prebooking.quantity, productTitle: listing.title, productPrice: listing.price });
+        }
+        catch (err) {
+
+            await client.query("ROLLBACK");
+
+            reject(err);
+        }
+        finally {
+            client.release();
+
+        }
+    });
+}
+
+module.exports = { add, remove, approve, get };

@@ -12,6 +12,7 @@
     "koa-mount": "^4.0.0",
     "koa-static": "^5.0.0",
     "mime-types": "^2.1.35",
+    "nodemon": "^2.0.16",
     "pg": "^8.7.3",
     "redis": "^4.1.0"
   }

@@ -34,17 +34,10 @@ router.post("/book", auth.checkAuth, async (ctx) => {
 });
 
 router.post("/cancel", auth.checkAuth, async (ctx) => {
-    if (ctx.user.type != "buyer") {
-        ctx.status = 401;
-        ctx.body = { err: "action not allowed for this account type" };
-        return;
-    }
-
-
     try {
         const { prebooking_number } = ctx.request.body;
 
-        const response = await controllers.prebookings.cancel(ctx.user, prebooking_number);
+        const response = await controllers.prebookings.cancel(prebooking_number);
 
         ctx.status = response.status;
         if (response.body) {
@@ -58,6 +51,44 @@ router.post("/cancel", auth.checkAuth, async (ctx) => {
         return;
     }
 });
+
+router.post("/approve", auth.checkAuth, async (ctx) => {
+    try {
+        const { prebooking_number } = ctx.request.body;
+
+        const response = await controllers.prebookings.approve(prebooking_number);
+
+        ctx.status = response.status;
+        if (response.body) {
+            ctx.body = response.body;
+        }
+
+    }
+    catch (err) {
+        ctx.status = err.status;
+        ctx.body = err.body;
+        return;
+    }
+});
+
+router.post("/get", auth.checkAuth, async (ctx) => {
+    try {
+        const { prebooking_number } = ctx.request.body;
+
+        const response = await controllers.prebookings.get(prebooking_number);
+
+        ctx.status = response.status;
+        if (response.body) {
+            ctx.body = response.body;
+        }
+
+    }
+    catch (err) {
+        ctx.status = err.status;
+        ctx.body = err.body;
+        return;
+    }
+})
 
 
 module.exports = router;
