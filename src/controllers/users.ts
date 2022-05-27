@@ -6,7 +6,7 @@ const config = require('../config');
 const models = require('../models');
 const services = require('../services');
 
-const register = async (username, password, type) => {
+const register = async (username: string, password: string, type: string) => {
   try {
     const saltRounds = 10;
 
@@ -15,11 +15,11 @@ const register = async (username, password, type) => {
     await models.users.create(username, passwordHash, type);
     return ({ status: 200 });
   } catch (err) {
-    throw new Error({ status: 500, body: { err: err.detail } });
+    throw ({ status: 500, body: err.toString() });
   }
 };
 
-const login = async (username, password) => {
+const login = async (username:string, password:string) => {
   try {
     const user = await models.users.findByUsername(username);
 
@@ -57,11 +57,11 @@ const login = async (username, password) => {
   } catch (err) {
     console.log(err);
 
-    throw new Error({
+    throw ({
       status: 500,
-      body: { err: err.detail },
+      body: err.toString(),
     });
   }
 };
 
-module.exports = { register, login };
+export { register, login };

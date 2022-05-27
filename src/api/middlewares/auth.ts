@@ -1,6 +1,8 @@
+import { Context } from "vm";
+
 const jwt = require('jsonwebtoken');
 
-async function checkAuth(ctx, next) {
+async function checkAuth(ctx: Context, next: () => Promise<any>) {
   // check if header exists
   if (!ctx.headers.authorization) {
     ctx.status = 400;

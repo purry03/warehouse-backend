@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const models = require('../models');
 
-const book = async (user, listingId, quantity) => {
+const book = async (user: Username, listingId: string, quantity:number) => {
   try {
     if (!(listingId && quantity)) {
       return ({
@@ -24,16 +24,15 @@ const book = async (user, listingId, quantity) => {
       status: 200,
       body: newBooking,
     });
-  } catch (err) {
-    console.log(err);
-    throw new Error({
+  } catch (err: any) {
+    throw ({
       status: 200,
-      body: { err },
+      body: err.toString(),
     });
   }
 };
 
-const cancel = async (prebookingNumber) => {
+const cancel = async (prebookingNumber: string) => {
   try {
     const cancelledPrebooking = await models.prebookings.remove(prebookingNumber);
 
@@ -47,14 +46,14 @@ const cancel = async (prebookingNumber) => {
       status: 200,
     });
   } catch (err) {
-    throw new Error({
-      status: 500,
-      body: { err },
+     throw ({
+      status: 200,
+      body: err.toString(),
     });
   }
 };
 
-const approve = async (prebookingNumber) => {
+const approve = async (prebookingNumber: string) => {
   try {
     const approvedPrebooking = await models.prebookings.approve(prebookingNumber);
 
@@ -68,14 +67,14 @@ const approve = async (prebookingNumber) => {
       status: 200,
     });
   } catch (err) {
-    throw new Error({
-      status: 500,
-      body: { err },
+     throw ({
+      status: 200,
+      body: err.toString(),
     });
   }
 };
 
-const get = async (prebookingNumber) => {
+const get = async (prebookingNumber: string) => {
   try {
     const prebooking = await models.prebookings.get(prebookingNumber);
 
@@ -90,14 +89,13 @@ const get = async (prebookingNumber) => {
       body: prebooking,
     });
   } catch (err) {
-    console.log(err);
-    throw new Error({
+    throw ({
       status: 200,
       body: { err },
     });
   }
 };
 
-module.exports = {
+export {
   book, cancel, approve, get,
 };

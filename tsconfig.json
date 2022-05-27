@@ -1,0 +1,23 @@
+{ "ts-node": {
+  "files": true
+},
+"files": [
+  "src/global.d.ts"
+],
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "commonjs",
+    "lib": ["es2017"],
+    "outDir": "dist",
+    "rootDir": ".",
+    "typeRoots": ["./node_modules/@types"],
+    "types" : ["koa","koa-router","koa-bodyparser","koa-multer"],
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+  "include": [
+    "./src/"
+  ],
+
+}

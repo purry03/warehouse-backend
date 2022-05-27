@@ -1,3 +1,3 @@
 const crypto = require('./crypto');
 
-module.exports = { crypto };
+export { crypto };

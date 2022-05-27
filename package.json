@@ -1,28 +1,56 @@
 {
+  "name": "warehouse-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purry03/warehouse-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/purry03/warehouse-backend/issues"
+  },
+  "homepage": "https://github.com/purry03/warehouse-backend#readme",
+  "description": "",
   "dependencies": {
     "@koa/cors": "^3.3.0",
     "@koa/multer": "^3.0.0",
     "@koa/router": "^10.1.1",
+    "@types/koa-multer": "^1.0.1",
     "bcrypt": "^5.0.1",
+    "build": "^0.1.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
     "koa-body": "^5.0.0",
     "koa-mount": "^4.0.0",
+    "koa-router": "^10.1.1",
     "koa-static": "^5.0.0",
     "mime-types": "^2.1.35",
+    "multer": "^1.4.4",
     "nodemon": "^2.0.16",
     "pg": "^8.7.3",
     "redis": "^4.1.0"
   },
   "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.7",
+    "@types/koa-router": "^7.4.4",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.35",
     "eslint": "^8.16.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0"
+    "eslint-plugin-import": "^2.26.0",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
   },
   "scripts": {
     "eslint": "npx eslint src",
-    "eslint-fix": "npx eslint src --fix"
+    "eslint-fix": "npx eslint src --fix",
+    "build": "tsc",
+    "start": "ts-node src/index.ts"
   }
 }

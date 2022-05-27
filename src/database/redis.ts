@@ -4,15 +4,15 @@ const client = createClient();
 
 client.connect();
 
-client.on('error', (err) => console.log('Redis Client Error: ', err));
+client.on('error', (err: string) => console.log('Redis Client Error: ', err));
 
-const set = async (key, value) => {
+const set = async (key: string, value: any) => {
   await client.set(key, value);
 };
 
-const get = async (key) => {
+const get = async (key: string) => {
   const value = await client.get(key);
   return value;
 };
 
-module.exports = { set, get };
+export { set, get };

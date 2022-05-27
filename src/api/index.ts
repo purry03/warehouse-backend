@@ -6,8 +6,9 @@ const prebookRouter = require('./routes/prebookings');
 
 const apiRouter = new Router({ prefix: '/api' });
 
-const nestedRouters = [authRouter, listingRouter, prebookRouter];
 
-nestedRouters.forEach((router) => apiRouter.use(router.routes(), router.allowedMethods()));
+apiRouter.use(authRouter);
+apiRouter.use(listingRouter);
+apiRouter.use(prebookRouter);
 
-module.exports = apiRouter;
+export {apiRouter};

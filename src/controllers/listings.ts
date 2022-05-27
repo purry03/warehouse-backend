@@ -1,10 +1,12 @@
+import { File } from "koa-multer";
+
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
 const models = require('../models');
 const config = require('../config');
 
-const create = async (user, file, title, description, price, inventory) => {
+const create = async (user: User, file: File, title: string, description: string, price: number, inventory: number) => {
   try {
     if (user.type !== 'seller') {
       return ({
@@ -26,36 +28,34 @@ const create = async (user, file, title, description, price, inventory) => {
     return ({
       status: 200,
     });
-  } catch (err) {
-    console.log(err);
-    throw new Error({
+  } catch (err: any) {
+    throw ({
       status: 500,
-      body: { err },
+      body: err.toString(),
     });
   }
 };
 
-const remove = async (id) => {
+const remove = async (id:string) => {
   try {
     await models.listings.removeByID(id);
     return ({
       status: 200,
     });
-  } catch (err) {
-    throw new Error({
+  } catch (err: any) {
+    throw ({
       status: 500,
-      body: { err },
+      body: err.toString(),
     });
   }
 };
 
-const search = async (query) => {
+const search = async (query: string) => {
   try {
     const listings = await models.listings.find(query);
     return ({ status: 200, body: listings });
   } catch (err) {
-    console.log(err);
-    throw new Error({ status: 500, body: err });
+    throw({ status: 500, body: err.toString() });
   }
 };
 
@@ -64,31 +64,28 @@ const getAll = async () => {
     const listings = await models.listings.findAll();
     return ({ status: 200, body: listings });
   } catch (err) {
-    console.log(err);
-    throw new Error({ status: 500, body: err });
+    throw({ status: 500, body: err.toString() });
   }
 };
 
-const getByID = async (id) => {
+const getByID = async (id:string) => {
   try {
     const listings = await models.listings.findByID(id);
     return ({ status: 200, body: listings });
   } catch (err) {
-    console.log(err);
-    throw new Error({ status: 500, body: err });
+    throw({ status: 500, body: err.toString() });
   }
 };
 
-const getByUsername = async (username) => {
+const getByUsername = async (username:string) => {
   try {
     const listings = await models.listings.findByUsername(username);
     return ({ status: 200, body: listings });
   } catch (err) {
-    console.log(err);
-    throw new Error({ status: 500, body: err });
+    throw({ status: 500, body: err.toString() });
   }
 };
 
-module.exports = {
+export {
   create, remove, search, getAll, getByID, getByUsername,
 };

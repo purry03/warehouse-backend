@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const config = require('../config');
 
-const encrypt = (value) => {
+const encrypt = (value:string) => {
   const key = config.SECRET;
   const cipher = crypto.createCipher('aes256', key);
   let encrypted = cipher.update(value, 'utf8', 'hex');
@@ -10,7 +10,7 @@ const encrypt = (value) => {
   return encrypted;
 };
 
-const decrypt = (encrypted) => {
+const decrypt = (encrypted:string) => {
   const key = config.SECRET;
   const decipher = crypto.createDecipher('aes256', key);
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');
@@ -18,4 +18,4 @@ const decrypt = (encrypted) => {
   return decrypted;
 };
 
-module.exports = { encrypt, decrypt };
+export { encrypt, decrypt };

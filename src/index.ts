@@ -14,10 +14,10 @@ app.use(serve(path.join(__dirname, '../public')));
 app.use(koaBody());
 app.use(cors());
 
-app.use(api.routes());
-app.use(api.allowedMethods());
+app.use(api.apiRouter.routes());
+app.use(api.apiRouter.allowedMethods());
 
-app.listen(8080, (err) => {
+app.listen(8080, (err: any) => {
   if (err) {
     console.log(err);
   } else {

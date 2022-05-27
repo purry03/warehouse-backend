@@ -1,6 +1,6 @@
 const pool = require('../database/postgres');
 
-const add = async (currentUser, listingId, quantity, prebookingNumber) => {
+const add = async (currentUser: User, listingId:string, quantity:string, prebookingNumber:string) => {
   const client = await pool.connect();
 
   try {
@@ -38,7 +38,7 @@ const add = async (currentUser, listingId, quantity, prebookingNumber) => {
   }
 };
 
-const remove = async (prebookingNumber) => {
+const remove = async (prebookingNumber:string) => {
   const client = await pool.connect();
 
   try {
@@ -75,7 +75,7 @@ const remove = async (prebookingNumber) => {
   }
 };
 
-const approve = async (prebookingNumber) => {
+const approve = async (prebookingNumber:string) => {
   const client = await pool.connect();
 
   try {
@@ -95,7 +95,7 @@ const approve = async (prebookingNumber) => {
   }
 };
 
-const get = async (prebookingNumber) => {
+const get = async (prebookingNumber:string) => {
   const client = await pool.connect();
 
   try {
@@ -120,6 +120,6 @@ const get = async (prebookingNumber) => {
   }
 };
 
-module.exports = {
+export {
   add, remove, approve, get,
 };

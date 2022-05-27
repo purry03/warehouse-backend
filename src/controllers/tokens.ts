@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const services = require('../services');
 const models = require('../models');
 
-const refresh = async (username, refreshToken) => {
+const refresh = async (username: string, refreshToken: string) => {
   try {
     const dbToken = await services.crypto.decrypt(await models.tokens.find(username));
 
@@ -41,11 +41,11 @@ const refresh = async (username, refreshToken) => {
       },
     });
   } catch (err) {
-    throw new Error({
+    throw ({
       status: 500,
-      body: { err },
+      body: err.toString(),
     });
   }
 };
 
-module.exports = { refresh };
+export default {refresh};
