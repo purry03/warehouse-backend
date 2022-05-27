@@ -9,7 +9,7 @@ const api = require('./api');
 
 const app = new Koa();
 
-app.use(serve(path.join(__dirname, '../../public')));
+app.use(serve(path.join(__dirname, '../public')));
 
 app.use(koaBody());
 app.use(cors());
