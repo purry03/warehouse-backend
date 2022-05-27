@@ -1,159 +1,125 @@
-const pool = require("../database/postgres");
+const pool = require('../database/postgres');
 
 const add = async (currentUser, listingId, quantity, prebookingNumber) => {
-    return new Promise(async (resolve, reject) => {
+  const client = await pool.connect();
 
-        const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-        try {
+    const user = (await client.query('SELECT * FROM users WHERE username = $1', [currentUser.username])).rows[0];
 
-            await client.query("BEGIN");
+    const listing = (await client.query('SELECT inventory FROM listings WHERE listing_id = $1', [listingId])).rows[0];
 
-            const user = (await client.query("SELECT * FROM users WHERE username = $1", [currentUser.username])).rows[0];
+    if (!listing) {
+      return ({ err: 'listing does not exist' });
+    }
 
-            const listing = (await client.query("SELECT inventory FROM listings WHERE listing_id = $1", [listingId])).rows[0];
+    const newInventory = listing.inventory - parseInt(quantity, 10);
 
-            if (!listing) {
-                resolve({ err: "listing does not exist" });
-                return;
-            }
+    if (newInventory < 0) {
+      return ({ err: 'not enough inventory' });
+    }
 
-            const newInventory = listing.inventory - parseInt(quantity);
+    await client.query('UPDATE listings SET inventory = $1 WHERE listing_id = $2 ', [newInventory, listingId]);
 
-            if (newInventory < 0) {
-                resolve({ err: "not enough inventory" });
-                return;
-            }
+    const currentDate = new Date();
 
-            await client.query("UPDATE listings SET inventory = $1 WHERE listing_id = $2 ", [newInventory, listingId]);
+    const newBooking = (await client.query('INSERT INTO prebookings(prebooking_number,listing_id,user_id,quantity,created_at) VALUES($1,$2,$3,$4,$5) RETURNING *', [prebookingNumber, listingId, user.user_id, quantity, currentDate])).rows[0];
 
+    await client.query('COMMIT');
 
-            const currentDate = new Date();
+    return (newBooking);
+  } catch (err) {
+    await client.query('ROLLBACK');
 
-            const newBooking = (await client.query("INSERT INTO prebookings(prebooking_number,listing_id,user_id,quantity,created_at) VALUES($1,$2,$3,$4,$5) RETURNING *", [prebookingNumber, listingId, user.user_id, quantity, currentDate])).rows[0];
+    throw (err);
+  } finally {
+    client.release();
+  }
+};
 
-            await client.query('COMMIT')
+const remove = async (prebookingNumber) => {
+  const client = await pool.connect();
 
-            resolve(newBooking);
-        }
-        catch (err) {
+  try {
+    await client.query('BEGIN');
 
-            await client.query("ROLLBACK");
+    // get quantity of prebook
+    const prebook = (await client.query('SELECT user_id,listing_id,quantity FROM prebookings WHERE prebooking_number = $1', [prebookingNumber])).rows[0];
 
-            reject(err);
-        }
-        finally {
-            client.release();
+    if (!prebook) {
+      await client.query('ROLLBACK');
+      return ({ err: 'invalid prebooking number' });
+    }
 
-        }
-    });
-}
+    // add to inventory
 
-const remove = async (prebooking_number) => {
-    return new Promise(async (resolve, reject) => {
+    const listing = (await client.query('SELECT inventory FROM listings WHERE listing_id = $1', [prebook.listing_id])).rows[0];
 
-        const client = await pool.connect();
+    const newInventory = listing.inventory + prebook.quantity;
 
-        try {
+    await client.query('UPDATE listings SET inventory = $1 WHERE listing_id = $2', [newInventory, prebook.listing_id]);
 
-            await client.query("BEGIN");
+    // delete prebooking
 
-            //get quantity of prebook
-            const prebook = (await client.query("SELECT user_id,listing_id,quantity FROM prebookings WHERE prebooking_number = $1", [prebooking_number])).rows[0];
+    await client.query('DELETE FROM prebookings WHERE prebooking_number = $1', [prebookingNumber]);
 
-            if (!prebook) {
-                await client.query('ROLLBACK');
-                resolve({ err: "invalid prebooking number" });
-                return;
-            }
+    await client.query('COMMIT');
 
-            //add to inventory
+    return (true);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw (err);
+  } finally {
+    client.release();
+  }
+};
 
-            const listing = (await client.query("SELECT inventory FROM listings WHERE listing_id = $1", [prebook.listing_id])).rows[0];
+const approve = async (prebookingNumber) => {
+  const client = await pool.connect();
 
-            const newInventory = listing.inventory + prebook.quantity;
+  try {
+    await client.query('BEGIN');
 
-            await client.query("UPDATE listings SET inventory = $1 WHERE listing_id = $2", [newInventory, prebook.listing_id]);
+    await client.query('DELETE FROM prebookings WHERE prebooking_number = $1', [prebookingNumber]);
 
-            //delete prebooking
+    await client.query('COMMIT');
 
-            await client.query("DELETE FROM prebookings WHERE prebooking_number = $1", [prebooking_number]);
+    return (true);
+  } catch (err) {
+    await client.query('ROLLBACK');
 
-
-            await client.query('COMMIT')
-
-            resolve(true);
-        }
-        catch (err) {
-            console.log(err);
-            await client.query("ROLLBACK");
-
-            reject(err);
-        }
-        finally {
-            client.release();
-
-        }
-    });
-}
-
-const approve = async (prebooking_number) => {
-    return new Promise(async (resolve, reject) => {
-
-        const client = await pool.connect();
-
-        try {
-
-            await client.query("BEGIN");
-
-
-            await client.query("DELETE FROM prebookings WHERE prebooking_number = $1", [prebooking_number]);
-
-
-            await client.query('COMMIT')
-
-            resolve(true);
-        }
-        catch (err) {
-            console.log(err);
-            await client.query("ROLLBACK");
-
-            reject(err);
-        }
-        finally {
-            client.release();
-
-        }
-    });
-}
+    throw (err);
+  } finally {
+    client.release();
+  }
+};
 
 const get = async (prebookingNumber) => {
-    return new Promise(async (resolve, reject) => {
+  const client = await pool.connect();
 
-        const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-        try {
+    const prebooking = (await client.query('SELECT * FROM prebookings WHERE prebooking_number = $1', [prebookingNumber])).rows[0];
+    const user = (await client.query('SELECT * FROM users WHERE user_id = $1', [prebooking.user_id])).rows[0];
+    const listing = (await client.query('SELECT * FROM listings WHERE listing_id = $1', [prebooking.listing_id])).rows[0];
 
-            await client.query("BEGIN");
-
-            const prebooking = (await client.query("SELECT * FROM prebookings WHERE prebooking_number = $1", [prebookingNumber])).rows[0];
-            const user = (await client.query("SELECT * FROM users WHERE user_id = $1", [prebooking.user_id])).rows[0];
-            const listing = (await client.query("SELECT * FROM listings WHERE listing_id = $1", [prebooking.listing_id])).rows[0];
-
-
-            resolve({ username: user.username, quantity: prebooking.quantity, productTitle: listing.title, productPrice: listing.price });
-        }
-        catch (err) {
-
-            await client.query("ROLLBACK");
-
-            reject(err);
-        }
-        finally {
-            client.release();
-
-        }
+    return ({
+      username: user.username,
+      quantity: prebooking.quantity,
+      productTitle: listing.title,
+      productPrice: listing.price,
     });
-}
+  } catch (err) {
+    await client.query('ROLLBACK');
 
-module.exports = { add, remove, approve, get };
+    throw (err);
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = {
+  add, remove, approve, get,
+};

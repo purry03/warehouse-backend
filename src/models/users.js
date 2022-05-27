@@ -1,67 +1,33 @@
-const pool = require("../database/postgres");
+const pool = require('../database/postgres');
 
 const create = async (username, passwordHash, type) => {
+  const client = await pool.connect();
 
-    return new Promise(async (resolve, reject) => {
+  await client.query('INSERT INTO users(username,password,type) VALUES($1,$2,$3) RETURNING *', [username, passwordHash, type]);
 
-        try {
-            const client = await pool.connect();
+  client.release();
 
-            await client.query("INSERT INTO users(username,password,type) VALUES($1,$2,$3) RETURNING *", [username, passwordHash, type]);
-
-            client.release();
-
-            resolve(true);
-        }
-        catch (err) {
-            reject(err);
-        }
-
-    });
-
-}
+  return (true);
+};
 
 const findByUsername = async (username) => {
+  const client = await pool.connect();
 
-    return new Promise(async (resolve, reject) => {
+  const user = (await client.query('SELECT * FROM users WHERE username = $1', [username])).rows[0];
 
-        try {
-            const client = await pool.connect();
+  client.release();
 
-            const user = (await client.query("SELECT * FROM users WHERE username = $1", [username])).rows[0];
+  return (user);
+};
 
-            client.release();
+const findById = async (userID) => {
+  const client = await pool.connect();
 
-            resolve(user);
+  const user = (await client.query('SELECT * FROM users WHERE user_id = $1', [userID])).rows[0];
 
-        }
-        catch (err) {
-            reject(err);
-        }
+  client.release();
 
-    });
-
-}
-
-const findById = async (user_id) => {
-
-    return new Promise(async (resolve, reject) => {
-
-        try {
-            const client = await pool.connect();
-
-            const user = (await client.query("SELECT * FROM users WHERE user_id = $1", [user_id])).rows[0];
-
-            client.release();
-
-            resolve(user);
-        }
-        catch (err) {
-            reject(err);
-        }
-
-    });
-
-}
+  return (user);
+};
 
 module.exports = { create, findByUsername, findById };

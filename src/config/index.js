@@ -1,7 +1,7 @@
-const path = require('path')
+const path = require('path');
 
-const envPath = path.resolve(__basedir, "../.env");
+const envPath = path.resolve(__dirname, '../../.env');
 
-require("dotenv").config({ path: envPath });
+require('dotenv').config({ path: envPath });
 
-module.exports = process.env
+module.exports = process.env;
