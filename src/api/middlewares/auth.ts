@@ -1,8 +1,8 @@
-import { Context } from "vm";
+import { Context,Next } from "koa";
 
 const jwt = require('jsonwebtoken');
 
-async function checkAuth(ctx: Context, next: () => Promise<any>) {
+async function checkAuth(ctx: Context, next: Next) {
   // check if header exists
   if (!ctx.headers.authorization) {
     ctx.status = 400;
@@ -13,7 +13,7 @@ async function checkAuth(ctx: Context, next: () => Promise<any>) {
   const headerData = ctx.headers.authorization.split(' ');
 
   if (headerData.length === 2) {
-    const token = headerData[1];
+    const token:string = headerData[1];
 
     let decoded;
 

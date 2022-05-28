@@ -30,4 +30,4 @@ const findById = async (userID:string) => {
   return (user);
 };
 
-export { create, findByUsername, findById };
+export = { create, findByUsername, findById };

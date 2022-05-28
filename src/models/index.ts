@@ -3,7 +3,7 @@ const tokens = require('./tokens');
 const listings = require('./listings');
 const prebookings = require('./prebookings');
 
-export {
+export = {
   users,
   tokens,
   listings,

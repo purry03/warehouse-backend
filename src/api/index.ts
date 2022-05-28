@@ -4,6 +4,8 @@ const authRouter = require('./routes/auth');
 const listingRouter = require('./routes/listings');
 const prebookRouter = require('./routes/prebookings');
 
+import {} from 'koa-router';
+
 const apiRouter = new Router({ prefix: '/api' });
 
 

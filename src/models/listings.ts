@@ -29,7 +29,7 @@ const removeByID = async (id:string) => {
 
 const findAll = async () => {
   const client = await pool.connect();
-  const listings = (await client.query('SELECT * FROM listings')).rows;
+  const listings = (await client.query('SELECT * FROM listings ORDER BY title ASC')).rows;
   client.release();
   return listings;
 };

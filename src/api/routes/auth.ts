@@ -44,7 +44,6 @@ router.post('/refresh', async (ctx: Context) => {
     // check if refresh token exists in db
 
     const response = <Response>(await controllers.tokens.refresh(username, refreshToken));
-
     ctx.status = response.status;
     if (response.body) {
       ctx.body = response.body;
