@@ -1,4 +1,4 @@
-const { createClient } = require('redis');
+import { createClient } from "redis";
 
 const client = createClient();
 
@@ -10,9 +10,9 @@ const set = async (key: string, value: string) => {
   await client.set(key, value);
 };
 
-const get = async (key: string) => {
+const get = async (key: string):Promise<string> => {
   const value:string = await client.get(key);
   return value;
 };
 
-export { set, get };
+export default { set, get };

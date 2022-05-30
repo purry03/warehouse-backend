@@ -1,13 +1,15 @@
-import { Context, Request } from "koa";
+import { Context } from "koa";
 
-const Router = require('@koa/router');
+import * as Router from '@koa/router';
 const router = new Router({ prefix: '/listing' });
 
-const multer = require('@koa/multer');
-const { auth } = require('../middlewares');
+import * as multer from '@koa/multer';
 
-const controllers = require('../../controllers');
-const upload = multer({ dest: '../uploads/' });
+import auth from '../middlewares';
+
+import controllers  from '../../controllers';
+
+const upload = multer({ dest: '/uploads/' });
 
 router.post('/add', auth.checkAuth, upload.single('img'), async (ctx: Context) => {
   try {
@@ -72,7 +74,7 @@ router.get('/search/:query', async (ctx: Context) => {
 router.get('/id/:id', async (ctx: Context) => {
   try {
     const { id } = <ID>ctx.params;
-    const response = <Response>(await controllers.listings.getByID(id));
+    const response = await controllers.listings.getByID(id);
     ctx.status = response.status;
     if (response.body) {
       ctx.body = response.body;
@@ -86,7 +88,7 @@ router.get('/id/:id', async (ctx: Context) => {
 router.get('/seller/:username', auth.checkAuth, async (ctx: Context) => {
   try {
     const { username } = <Username>ctx.params;
-    const response = <Response>(await controllers.listings.getByUsername(username));
+    const response = await controllers.listings.getByUsername(username);
     ctx.status = response.status;
     if (response.body) {
       ctx.body = response.body;
@@ -97,4 +99,4 @@ router.get('/seller/:username', auth.checkAuth, async (ctx: Context) => {
   }
 });
 
-export {router};
+export default router.routes();

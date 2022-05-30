@@ -1,6 +1,10 @@
+import * as path from 'path';
+import * as dotenv from 'dotenv';
 
-const envPath = require('path').resolve(__dirname, '../../.env');
+const envPath = path.resolve(__dirname, '../../.env');
 
-require('dotenv').config({ path: envPath });
+dotenv.config({ path: envPath });
 
-module.exports = process.env;
+const config:ProcessEnv = <any>process.env
+
+export default config;

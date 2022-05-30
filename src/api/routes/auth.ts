@@ -1,12 +1,12 @@
-import { Context, Request } from "koa";
+import { Context } from "koa";
 
-const Router = require('@koa/router');
+import * as Router from '@koa/router';
 
 const router = new Router({ prefix: '/auth' });
 
-const { auth } = require('../middlewares');
+import auth  from '../middlewares';
 
-const controllers = require('../../controllers');
+import controllers  from '../../controllers';
 
 router.post('/register', async (ctx: Context) => {
   try {
@@ -58,4 +58,4 @@ router.get('/verify', auth.checkAuth, async (ctx: Context) => {
   ctx.status = 200;
 });
 
-export {router};
+export default router.routes();

@@ -1,23 +1,23 @@
-const pool = require('../database/postgres');
+import pool from '../database/postgres';
 
-const add = async (currentUser: User, listingId:string, quantity:string, prebookingNumber:string) => {
+const add = async (currentUser: string, listingId:string, quantity:string, prebookingNumber:string):Promise<DbPrebooking> => {
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    const user = (await client.query('SELECT * FROM users WHERE username = $1', [currentUser.username])).rows[0];
+    const user = (await client.query('SELECT * FROM users WHERE username = $1', [currentUser])).rows[0];
 
     const listing = (await client.query('SELECT inventory FROM listings WHERE listing_id = $1', [listingId])).rows[0];
 
     if (!listing) {
-      return ({ err: 'listing does not exist' });
+      throw ({ err: 'listing does not exist' });
     }
 
     const newInventory = listing.inventory - parseInt(quantity, 10);
 
     if (newInventory < 0) {
-      return ({ err: 'not enough inventory' });
+      throw ({ err: 'not enough inventory' });
     }
 
     await client.query('UPDATE listings SET inventory = $1 WHERE listing_id = $2 ', [newInventory, listingId]);
@@ -38,7 +38,7 @@ const add = async (currentUser: User, listingId:string, quantity:string, prebook
   }
 };
 
-const remove = async (prebookingNumber:string) => {
+const remove = async (prebookingNumber:string):Promise<boolean> => {
   const client = await pool.connect();
 
   try {
@@ -49,7 +49,7 @@ const remove = async (prebookingNumber:string) => {
 
     if (!prebook) {
       await client.query('ROLLBACK');
-      return ({ err: 'invalid prebooking number' });
+      throw ({ err: 'invalid prebooking number' });
     }
 
     // add to inventory
@@ -75,7 +75,7 @@ const remove = async (prebookingNumber:string) => {
   }
 };
 
-const approve = async (prebookingNumber:string) => {
+const approve = async (prebookingNumber:string):Promise<boolean> => {
   const client = await pool.connect();
 
   try {
@@ -95,7 +95,7 @@ const approve = async (prebookingNumber:string) => {
   }
 };
 
-const get = async (prebookingNumber:string) => {
+const get = async (prebookingNumber:string):Promise<Prebooking> => {
   const client = await pool.connect();
 
   try {
@@ -120,6 +120,6 @@ const get = async (prebookingNumber:string) => {
   }
 };
 
-export {
+export default {
   add, remove, approve, get,
 };

@@ -1,3 +1,3 @@
-const crypto = require('./crypto');
+import crypto from './crypto';
 
-export = {crypto} ;
+export default {crypto};

@@ -1,11 +1,12 @@
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const services = require('../services');
-const models = require('../models');
+import * as crypto from 'crypto';
+import * as jwt from 'jsonwebtoken';
+
+import models from '../models';
+import services from '../services';
 
 const refresh = async (username: string, refreshToken: string) => {
   try {
-    const dbToken = await services.crypto.decrypt(await models.tokens.find(username));
+    const dbToken:string = await services.crypto.decrypt(await models.tokens.find(username));
 
     if (!dbToken) {
       return ({
@@ -24,11 +25,11 @@ const refresh = async (username: string, refreshToken: string) => {
     const user = await models.users.findByUsername(username);
 
     const currentTime = new Date();
-    const accessToken = jwt.sign({ createdAt: currentTime, username: user.username, userType: user.type }, process.env.SECRET, { expiresIn: '1h' });
-    const newRefreshToken = crypto.randomBytes(8).toString('hex');
-    const newEncryptedRefreshToken = services.crypto.encrypt(newRefreshToken);
+    const accessToken:string = jwt.sign({ createdAt: currentTime, username: user.username, userType: user.type }, process.env.SECRET, { expiresIn: '1h' });
+    const newRefreshToken:string = crypto.randomBytes(8).toString('hex');
+    const newEncryptedRefreshToken:string = services.crypto.encrypt(newRefreshToken);
 
-    await models.tokens.update(username, newEncryptedRefreshToken, currentTime);
+    await models.tokens.update(username, newEncryptedRefreshToken);
 
     return ({
       status: 200,

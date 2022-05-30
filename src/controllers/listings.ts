@@ -1,10 +1,11 @@
 import { File } from "koa-multer";
 
-const fs = require('fs');
-const path = require('path');
-const mime = require('mime-types');
-const models = require('../models');
-const config = require('../config');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as mime from 'mime-types';
+
+import models from '../models';
+import config from '../config';
 
 const create = async (user: User, file: File, title: string, description: string, price: number, inventory: number) => {
   try {
@@ -68,7 +69,7 @@ const getAll = async () => {
   }
 };
 
-const getByID = async (id:string) => {
+const getByID = async (id:string):Promise<Response> => {
   try {
     const listings = await models.listings.findByID(id);
     return ({ status: 200, body: listings });
@@ -86,6 +87,6 @@ const getByUsername = async (username:string) => {
   }
 };
 
-export {
+export default {
   create, remove, search, getAll, getByID, getByUsername,
 };

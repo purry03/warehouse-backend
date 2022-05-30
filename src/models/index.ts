@@ -1,9 +1,9 @@
-const users = require('./users');
-const tokens = require('./tokens');
-const listings = require('./listings');
-const prebookings = require('./prebookings');
+import users from './users';
+import tokens from './tokens';
+import listings from './listings';
+import prebookings from './prebookings';
 
-export = {
+export default {
   users,
   tokens,
   listings,

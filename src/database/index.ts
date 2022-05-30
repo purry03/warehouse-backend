@@ -1,4 +1,4 @@
-const postgres = require('./postgres');
-const redis = require('./redis');
+import postgres from './postgres';
+import redis from './redis';
 
-export { postgres, redis };
+export default { postgres, redis };

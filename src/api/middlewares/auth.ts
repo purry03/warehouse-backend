@@ -1,6 +1,6 @@
 import { Context,Next } from "koa";
 
-const jwt = require('jsonwebtoken');
+import * as jwt from 'jsonwebtoken';
 
 async function checkAuth(ctx: Context, next: Next) {
   // check if header exists
@@ -18,7 +18,7 @@ async function checkAuth(ctx: Context, next: Next) {
     let decoded;
 
     try {
-      decoded = await jwt.verify(token, process.env.SECRET);
+      decoded = <JwtData>await jwt.verify(token, process.env.SECRET);
     } catch (err) {
       ctx.status = 400;
       ctx.body = { err: err.message };
@@ -34,4 +34,4 @@ async function checkAuth(ctx: Context, next: Next) {
   }
 }
 
-module.exports = { checkAuth };
+export default {checkAuth}

@@ -1,16 +1,16 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const config = require('../config');
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
+import config from '../config';
 
-const models = require('../models');
-const services = require('../services');
+import models from '../models';
+import services from '../services';
 
-const register = async (username: string, password: string, type: string) => {
+const register = async (username: string, password: string, type: string):Promise<Response> => {
   try {
     const saltRounds = 10;
 
-    const passwordHash = bcrypt.hashSync(password, saltRounds);
+    const passwordHash:string = bcrypt.hashSync(password, saltRounds);
 
     await models.users.create(username, passwordHash, type);
     return ({ status: 200 });
@@ -19,7 +19,7 @@ const register = async (username: string, password: string, type: string) => {
   }
 };
 
-const login = async (username:string, password:string) => {
+const login = async (username:string, password:string):Promise<Response> => {
   try {
     const user = await models.users.findByUsername(username);
 
@@ -36,7 +36,7 @@ const login = async (username:string, password:string) => {
       const refreshToken = crypto.randomBytes(8).toString('hex');
       const encryptedRefreshToken = services.crypto.encrypt(refreshToken);
 
-      await models.tokens.add(username, encryptedRefreshToken, currentTime);
+      await models.tokens.add(username, encryptedRefreshToken);
 
       return ({
         status: 200,
@@ -64,4 +64,4 @@ const login = async (username:string, password:string) => {
   }
 };
 
-export { register, login };
+export  default { register, login };
