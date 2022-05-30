@@ -1,12 +1,12 @@
 import { Context } from "koa";
 
-const Router = require('@koa/router');
+import * as Router from '@koa/router';
 
 const router = new Router({ prefix: '/prebooking' });
 
-const { auth } = require('../middlewares');
+import auth from '../middlewares';
 
-const controllers = require('../../controllers');
+import controllers  from '../../controllers';
 
 router.post('/book', auth.checkAuth, async (ctx: Context) => {
   if (ctx.user.type !== 'buyer') {
@@ -32,7 +32,7 @@ router.post('/book', auth.checkAuth, async (ctx: Context) => {
 
 router.post('/cancel', auth.checkAuth, async (ctx: Context) => {
   try {
-    const prebookingNumber = <PrebookingNumber>ctx.request.body.prebooking_number;
+    const prebookingNumber:string = ctx.request.body.prebooking_number;
 
     const response = <Response>(await controllers.prebookings.cancel(prebookingNumber));
 
@@ -48,9 +48,9 @@ router.post('/cancel', auth.checkAuth, async (ctx: Context) => {
 
 router.post('/approve', auth.checkAuth, async (ctx:Context) => {
   try {
-    const prebookingNumber = <PrebookingNumber>ctx.request.body.prebooking_number;
-
-    const response = <Response>(await controllers.prebookings.approve(prebookingNumber));
+    const prebookingNumber:string = ctx.request.body.prebooking_number;
+``
+    const response = await controllers.prebookings.approve(prebookingNumber);
 
     ctx.status = response.status;
     if (response.body) {
@@ -64,9 +64,9 @@ router.post('/approve', auth.checkAuth, async (ctx:Context) => {
 
 router.post('/get', auth.checkAuth, async (ctx: Context) => {
   try {
-    const prebookingNumber = <PrebookingNumber>ctx.request.body.prebooking_number;
+    const prebookingNumber:string = ctx.request.body.prebooking_number;
 
-    const response = <Response>(await controllers.prebookings.get(prebookingNumber));
+    const response = await controllers.prebookings.get(prebookingNumber);
 
     ctx.status = response.status;
     if (response.body) {
@@ -78,4 +78,4 @@ router.post('/get', auth.checkAuth, async (ctx: Context) => {
   }
 });
 
-export {router};
+export default router.routes();
