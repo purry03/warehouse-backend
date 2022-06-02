@@ -1,102 +1,44 @@
-import { Context } from "koa";
+import {
+  Context
+} from "koa";
 
 import * as Router from '@koa/router';
-const router = new Router({ prefix: '/listing' });
+const router = new Router({
+  prefix: '/listing'
+});
 
 import * as multer from '@koa/multer';
 
 import auth from '../middlewares';
 
-import controllers  from '../../controllers';
+import controllers from '../../controllers';
 
-const upload = multer({ dest: '/uploads/' });
+const upload = multer({
+  dest: '/uploads/'
+});
 
 router.post('/add', auth.checkAuth, upload.single('img'), async (ctx: Context) => {
-  try {
-    const {
-      title, description, price, inventory,
-    } = <ReqAddListing>ctx.request.body;
-
-    const response = <Response>(await controllers.listings.create(
-      ctx.user,
-      ctx.file,
-      title,
-      description,
-      price,
-      inventory,
-    ));
-
-    ctx.status = response.status;
-  } catch (err: any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.create(ctx);
 });
 
 router.post('/remove/:id', auth.checkAuth, upload.single('img'), async (ctx: Context) => {
-  try {
-    const { id } = <ID>ctx.params;
-    const response = <Response>(await controllers.listings.remove(id));
-    ctx.status = response.status;
-  } catch (err: any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.remove(ctx);
 });
 
 router.get('/search', async (ctx: Context) => {
-  try {
-    const response = <Response>(await controllers.listings.getAll());
-    ctx.status = response.status;
-    if (response.body) {
-      ctx.body = response.body;
-    }
-  } catch (err: any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.getAll(ctx);
 });
 
 router.get('/search/:query', async (ctx: Context) => {
-  try {
-    const { query } = <Query>ctx.params;
-    const response = <Response>(await controllers.listings.search(query));
-    ctx.status = response.status;
-    if (response.body) {
-      ctx.body = response.body;
-    }
-  } catch (err: any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.search(ctx);
 });
 
 router.get('/id/:id', async (ctx: Context) => {
-  try {
-    const { id } = <ID>ctx.params;
-    const response = await controllers.listings.getByID(id);
-    ctx.status = response.status;
-    if (response.body) {
-      ctx.body = response.body;
-    }
-  } catch (err:any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.getByID(ctx);
 });
 
 router.get('/seller/:username', auth.checkAuth, async (ctx: Context) => {
-  try {
-    const { username } = <Username>ctx.params;
-    const response = await controllers.listings.getByUsername(username);
-    ctx.status = response.status;
-    if (response.body) {
-      ctx.body = response.body;
-    }
-  } catch (err:any) {
-    ctx.status = err.status;
-    ctx.body = { err };
-  }
+  await controllers.listings.getByUsername(ctx);
 });
 
-export default router.routes();
+export default router;

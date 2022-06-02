@@ -1,3 +1,4 @@
+import { Pool } from 'pg';
 import pool from '../database/postgres';
 
 const create = async (username:string, passwordHash:string, type:string):Promise<boolean> => {

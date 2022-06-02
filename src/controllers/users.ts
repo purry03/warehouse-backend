@@ -5,26 +5,45 @@ import config from '../config';
 
 import models from '../models';
 import services from '../services';
+import {
+  Context
+} from 'koa';
 
-const register = async (username: string, password: string, type: string):Promise<Response> => {
+const register = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      username,
+      password,
+      type
+    } = < ReqRegister > ctx.request.body;
+
     const saltRounds = 10;
 
-    const passwordHash:string = bcrypt.hashSync(password, saltRounds);
+    const passwordHash: string = bcrypt.hashSync(password, saltRounds);
 
     await models.users.create(username, passwordHash, type);
-    return ({ status: 200 });
+    ctx.status = 200
   } catch (err) {
-    throw ({ status: 500, body: err.toString() });
+    ctx.status = 500;
+    ctx.body = err.toString();
   }
 };
 
-const login = async (username:string, password:string):Promise<Response> => {
+const login = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      username,
+      password
+    } = < ReqLogin > ctx.request.body;
+
     const user = await models.users.findByUsername(username);
 
     if (!user) {
-      return ({ status: 401, body: 'incorrrect credentials' });
+      ctx.status = 401;
+      ctx.body = {
+        err: 'incorrect credentials'
+      }
+      return;
     }
 
     const isValid = bcrypt.compareSync(password, user.password);
@@ -32,36 +51,43 @@ const login = async (username:string, password:string):Promise<Response> => {
     if (isValid) {
       const currentTime = new Date();
 
-      const accessToken = jwt.sign({ createdAt: currentTime, username: user.username, userType: user.type }, config.SECRET, { expiresIn: '1h' });
+      const accessToken = jwt.sign({
+        createdAt: currentTime,
+        username: user.username,
+        userType: user.type
+      }, config.SECRET, {
+        expiresIn: '1h'
+      });
       const refreshToken = crypto.randomBytes(8).toString('hex');
       const encryptedRefreshToken = services.crypto.encrypt(refreshToken);
 
       await models.tokens.add(username, encryptedRefreshToken);
 
-      return ({
-        status: 200,
-        body: {
-          username,
-          type: user.type,
-          access_token: accessToken,
-          token_type: 'jwt',
-          expires_in: 3600,
-          refresh_token: refreshToken,
-        },
-      });
-    }
-    return ({
-      status: 401,
-      body: { err: 'incorrect credentials' },
-    });
-  } catch (err) {
-    console.log(err);
+      ctx.status = 200;
+      ctx.body = {
+        username,
+        type: user.type,
+        access_token: accessToken,
+        token_type: 'jwt',
+        expires_in: 3600,
+        refresh_token: refreshToken,
+      }
 
-    throw ({
-      status: 500,
-      body: err.toString(),
-    });
+      return;
+    }
+    ctx.status = 401;
+    ctx.body = {
+      err: 'incorrect credentials'
+    }
+  } catch (err) {
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-export  default { register, login };
+export default {
+  register,
+  login
+};

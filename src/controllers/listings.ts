@@ -1,4 +1,6 @@
-import { File } from "koa-multer";
+import {
+  File
+} from "koa-multer";
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -6,14 +8,27 @@ import * as mime from 'mime-types';
 
 import models from '../models';
 import config from '../config';
+import {
+  Context
+} from "koa";
 
-const create = async (user: User, file: File, title: string, description: string, price: number, inventory: number) => {
+const create = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      title,
+      description,
+      price,
+      inventory,
+    } = < ReqAddListing > ctx.request.body;
+
+    const user: User = ctx.user;
+    const file: File = ctx.file;
+
     if (user.type !== 'seller') {
-      return ({
-        status: 403,
-        body: { err: 'action not allowed for this account type' },
-      });
+      ctx.status = 403;
+      ctx.body = {
+        err: 'action not allowed for this account type'
+      };
     }
 
     // copy file to public folder
@@ -26,67 +41,97 @@ const create = async (user: User, file: File, title: string, description: string
     const listingUser = await models.users.findByUsername(user.username);
     await models.listings.add(listingUser.user_id, `${file.filename}.${mime.extension(file.mimetype)}`, title, description, inventory, price);
 
-    return ({
-      status: 200,
-    });
+    ctx.status = 200;
   } catch (err: any) {
-    throw ({
-      status: 500,
-      body: err.toString(),
-    });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-const remove = async (id:string) => {
+const remove = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      id
+    } = < ID > ctx.params;
+
     await models.listings.removeByID(id);
-    return ({
-      status: 200,
-    });
+    ctx.status = 200;
   } catch (err: any) {
-    throw ({
-      status: 500,
-      body: err.toString(),
-    });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-const search = async (query: string) => {
+const search = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      query
+    } = < Query > ctx.params;
     const listings = await models.listings.find(query);
-    return ({ status: 200, body: listings });
+    ctx.status = 200;
+    ctx.body = listings;
   } catch (err) {
-    throw({ status: 500, body: err.toString() });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-const getAll = async () => {
+const getAll = async (ctx: Context): Promise < void > => {
   try {
     const listings = await models.listings.findAll();
-    return ({ status: 200, body: listings });
+    ctx.status = 200;
+    ctx.body = listings;
   } catch (err) {
-    throw({ status: 500, body: err.toString() });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-const getByID = async (id:string):Promise<Response> => {
+const getByID = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      id
+    } = < ID > ctx.params;
     const listings = await models.listings.findByID(id);
-    return ({ status: 200, body: listings });
+    ctx.status = 200;
+    ctx.body = listings;
   } catch (err) {
-    throw({ status: 500, body: err.toString() });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
-const getByUsername = async (username:string) => {
+const getByUsername = async (ctx: Context): Promise < void > => {
   try {
+    const {
+      username
+    } = < Username > ctx.params;
     const listings = await models.listings.findByUsername(username);
-    return ({ status: 200, body: listings });
+    ctx.status = 200;
+    ctx.body = listings;
   } catch (err) {
-    throw({ status: 500, body: err.toString() });
+    ctx.status = 500;
+    ctx.body = {
+      err: err.toString()
+    };
   }
 };
 
 export default {
-  create, remove, search, getAll, getByID, getByUsername,
+  create,
+  remove,
+  search,
+  getAll,
+  getByID,
+  getByUsername,
 };
