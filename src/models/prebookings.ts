@@ -1,12 +1,12 @@
 import pool from '../database/postgres';
 
-const add = async (currentUser: string, listingId:string, quantity:string, prebookingNumber:string):Promise<DbPrebooking> => {
+const add = async (currentUser: User, listingId:string, quantity:string, prebookingNumber:string):Promise<DbPrebooking> => {
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    const user = (await client.query('SELECT * FROM users WHERE username = $1', [currentUser])).rows[0];
+    const user = (await client.query('SELECT * FROM users WHERE username = $1', [currentUser.username])).rows[0];
 
     const listing = (await client.query('SELECT inventory FROM listings WHERE listing_id = $1', [listingId])).rows[0];
 

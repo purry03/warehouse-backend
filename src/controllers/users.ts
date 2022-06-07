@@ -9,6 +9,7 @@ import {
   Context
 } from 'koa';
 
+
 const register = async (ctx: Context): Promise < void > => {
   try {
     const {
@@ -16,6 +17,11 @@ const register = async (ctx: Context): Promise < void > => {
       password,
       type
     } = < ReqRegister > ctx.request.body;
+
+    if (!username || !password || !type) {
+      ctx.status = 400;
+      return;
+    }
 
     const saltRounds = 10;
 

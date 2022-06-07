@@ -70,6 +70,11 @@ const approve = async (ctx: Context): Promise < void > => {
 const get = async (ctx: Context): Promise < void > => {
   try {
 
+    if(!ctx.request.body){
+      ctx.status = 400;
+      return;
+    }
+
     const prebookingNumber: string = ctx.request.body.prebooking_number;
 
     const prebooking = await models.prebookings.get(prebookingNumber);

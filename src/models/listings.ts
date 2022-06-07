@@ -9,7 +9,7 @@ const add = async (userID:string, filename:string, title:string, description:str
 
 const find = async (query:string):Promise<DbListing[]> => {
   const client = await pool.connect();
-  const listings = (await client.query('SELECT * FROM listings WHERE listing_id = $1', [query])).rows;
+  const listings = (await client.query('SELECT * FROM listings WHERE title = $1', [query])).rows;
   client.release();
   return listings;
 };

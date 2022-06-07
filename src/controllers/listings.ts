@@ -68,9 +68,22 @@ const remove = async (ctx: Context): Promise < void > => {
 
 const search = async (ctx: Context): Promise < void > => {
   try {
+
+    if(!ctx.params){
+      ctx.status = 400;
+      ctx.body = {err : 'missing query string'};
+      return;
+    }
     const {
       query
     } = < Query > ctx.params;
+
+    if(!query){
+      ctx.status = 400;
+      ctx.body = {err : 'missing query string'};
+      return;
+    }
+
     const listings = await models.listings.find(query);
     ctx.status = 200;
     ctx.body = listings;
@@ -113,9 +126,20 @@ const getByID = async (ctx: Context): Promise < void > => {
 
 const getByUsername = async (ctx: Context): Promise < void > => {
   try {
+    if(!ctx.params){
+      ctx.status = 400;
+      ctx.body = {err : 'missing username'};
+      return;
+    }
     const {
       username
     } = < Username > ctx.params;
+
+    if(!username){
+      ctx.status = 400;
+      ctx.body = {err : 'missing username'};
+      return;
+    }
     const listings = await models.listings.findByUsername(username);
     ctx.status = 200;
     ctx.body = listings;
