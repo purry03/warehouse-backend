@@ -32,7 +32,7 @@ const create = async (ctx: Context): Promise < void > => {
     }
 
     // copy file to public folder
-    fs.copyFileSync(path.resolve(file.path), path.resolve(config.DIR, `./public/${file.filename}.${mime.extension(file.mimetype)}`));
+    fs.copyFileSync(path.resolve(file.path), path.resolve(__dirname, `../../public/${file.filename}.${mime.extension(file.mimetype)}`));
 
     // remove temp file from uploads dir
     fs.unlinkSync(path.resolve(file.path));
@@ -43,6 +43,7 @@ const create = async (ctx: Context): Promise < void > => {
 
     ctx.status = 200;
   } catch (err: any) {
+    console.log(err);
     ctx.status = 500;
     ctx.body = {
       err: err.toString()
