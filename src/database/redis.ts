@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createClient } from "redis";
 
-const client = createClient();
+// @ts-ignore
+const client = createClient({url : "redis://warehouse-redis:6379"});
 
 
 client.on('error', (err: string) => console.log('Redis Client Error: ', err));

@@ -14,7 +14,7 @@ import auth from '../middlewares';
 import controllers from '../../controllers';
 
 const upload = multer({
-  dest: '/uploads/'
+  dest: __dirname + '../../../uploads/'
 });
 
 router.post('/add', auth.checkAuth, upload.single('img'), async (ctx: Context) => {

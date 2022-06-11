@@ -18,5 +18,5 @@ app.use(api.apiRouter.routes());
 app.use(api.apiRouter.allowedMethods());
 
 app.listen(8080, () => {
-    console.log('Server online on port 3000');
+    console.log('Server online on port 8080');
 });
